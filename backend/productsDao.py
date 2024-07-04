@@ -1,23 +1,34 @@
-import mysql.connector
+from sqlConnection import get_sql_connection
 
-cnx = mysql.connector.connect(user='root', password='Chinezesqlrootpw@1',
-                              host='127.0.0.1',
-                              database='grocerystoreschema')
 
-cursor = cnx.cursor()
+def get_all_products(sql_connection):
+    cursor = sql_connection.cursor()
 
-query = (
-    "SELECT products.product_id, products.name, products.uom_id, products.price_per_unit, uom.uom_name "
-    "FROM grocerystoreschema.products "
-    "INNER JOIN grocerystoreschema.uom ON products.uom_id = uom.uom_id"
-)
+    query = (
+        "SELECT products.product_id, products.name, products.uom_id, products.price_per_unit, uom.uom_name "
+        "FROM grocerystoreschema.products "
+        "INNER JOIN grocerystoreschema.uom ON products.uom_id = uom.uom_id"
+    )
 
-cursor.execute(query)
+    cursor.execute(query)
 
-for (product_id, name, uom_id, price_per_unit, uom_name) in cursor:
-    print(product_id, name, uom_id, price_per_unit, uom_name)
+    response = []
 
-cnx.close()
+    for (product_id, name, uom_id, price_per_unit, uom_name) in cursor:
+        response.append({
+            "product_id": product_id,
+            "name": name,
+            "uom_id": uom_id,
+            "price_per_unit": price_per_unit,
+            "uom_name": uom_name
+        })
+
+
+    return response
+
 
 #making the output modular
-
+if __name__ == "__main__":
+    connection = get_sql_connection()
+    print(get_all_products(connection))
+    connection.close()
